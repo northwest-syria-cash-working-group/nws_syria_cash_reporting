@@ -1,0 +1,357 @@
+---
+title: "Cash response and collective sites"
+date:  "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  html_document:
+    code_download: yes
+    theme: readable
+    toc: yes
+    toc_depth: 4
+    toc_float: yes
+    number_sections: no
+    collapsed: no
+always_allow_html: yes
+---
+
+```{css, echo=FALSE}
+
+#TOC::before {
+  content: "";
+  display: block;
+  height: 70px;
+  margin: 2em 20px 40px 20px;
+  background-image: url("NWS-CWG logo.PNG");
+  background-size: contain;
+  background-position: center center;
+  background-repeat: no-repeat;
+}
+```
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, fig.width=9, message = FALSE, warning=FALSE)
+library(tidyverse)
+library(readxl)
+library(lubridate)
+library(stringi)
+library(pander)
+library(janitor)
+library(scales)
+library(magrittr)
+library(kableExtra)
+library(viridis)
+library(skimr)
+library(patchwork)
+library(DT)
+library(here)
+library(sf)
+library(googlesheets4)
+library(plotly)
+library(flextable)
+
+theme_set(theme_light())
+
+# disabling scientific notation
+options(scipen = 100)
+
+# pander tables all in one row
+panderOptions('table.split.table', Inf)
+
+# pander thousands separator
+panderOptions("big.mark", ",")
+
+# replace 
+opts <- options(knitr.kable.NA = "")
+
+`%out%` <- Negate(`%in%`)
+
+# function for transposing df
+transpose_df <- function(df) {
+  t_df <- data.table::transpose(df)
+  colnames(t_df) <- rownames(df)
+  rownames(t_df) <- colnames(df)
+  t_df <- t_df %>%
+    tibble::rownames_to_column(.data = .) %>%
+    tibble::as_tibble(.)
+  return(t_df)
+}
+
+# function beneficiary summaries
+sum_ben <- function(df, column_var){
+  
+  column_var <- enquo(column_var)
+  
+  df %>%
+    group_by(!!column_var) %>% # must add bang-bang
+    summarise(beneficiaries = sum(new_beneficiaries, na.rm = TRUE)) %>% 
+    arrange(desc(beneficiaries))
+    
+}
+
+# function beneficiary summaries, 2 grouped variables
+sum_ben2 <- function(df, column_var1, column_var2){
+  
+  column_var1 <- enquo(column_var1)
+  column_var2 <- enquo(column_var2)
+  
+  df %>%
+    group_by(!!column_var1, !!column_var2) %>% # must add bang-bang
+    summarise(beneficiaries = sum(new_beneficiaries, na.rm = TRUE), .groups = "drop")
+    
+}
+
+# scaling functions 
+range01 <- function(x){(x-min(x))/(max(x)-min(x))}
+range_wna <- function(x){(x-min(x, na.rm = TRUE))/(max(x, na.rm = TRUE)-min(x, na.rm = TRUE))}
+
+#mode function 
+mode <- function(x) {
+  ux <- unique(x)
+  ux[which.max(tabulate(match(x, ux)))]
+}
+```
+
+```{r data}
+pcode3_shape <- 
+  st_read("./data/syr_admbnda_uncs_unocha_20201217/syr_admbnda_adm3_uncs_unocha_20201217.shp", 
+          quiet = TRUE)
+
+locations <- read_excel("./data/Locations.xlsx") %>% 
+  clean_names()
+
+fsl <- read_csv("./data/for_report/fsl.csv") %>% 
+  mutate(partner_code = ifelse(is.na(partner_code), "temp_1", partner_code))
+
+sites <- read_csv("./data/for_report/sites.csv")
+
+site_locations_fsl <- read_csv("./data/for_report/sites_locations_fsl.csv")
+
+
+
+```
+
+
+
+
+# Interactive map of cash response beneficiaries and UNHCR-monitored collective centres
+
+Only beneficiaries who have received at least USD 100/family/month have been included. Additionally, current achievement reporting has yet to include the collective sites, so it is not clear to what extent needs have been met in these centres. 
+
+<br>
+
+```{r plotly-sites}
+
+site_map <- pcode3_shape %>% 
+  filter(ADM1_PCODE %in% c("SY02", "SY07")) %>% 
+  left_join(site_locations_fsl %>% 
+              filter(longitude_x > 36.636311 | 
+                       latitude_y < 36.838691), 
+            by = c("ADM1_PCODE" = "admin1pcode")) %>% 
+  st_as_sf() %>% 
+  mutate(type = fct_relevel(type, 
+                            c("RC/IDP", "Beneficiaries"))) %>% 
+  ggplot() + 
+  geom_sf(size = 0.1) +
+  geom_point(aes(size = persons, 
+                  colour = type,
+                  x = longitude_x, y = latitude_y, 
+                  text = paste0(sub_district, "\n", 
+                                site, "\n", 
+                                "persons: ", persons, "\n", 
+                                "type: ", type, "\n", 
+                                "x: ", longitude_x, "\n", 
+                                "y: ", latitude_y
+                                )), 
+             alpha = .1, pch = 1
+             # Adjusting alpha won't affect a plotly
+             ) +
+  scale_size_continuous(labels = comma) +
+  theme_void() + 
+  theme(plot.background = element_rect(fill = "white", colour = NA), 
+        plot.caption = element_text(hjust = 0.5), 
+        legend.position = "none") +
+  labs(title = "Collective/Reception centres and cash response beneficiaries")
+
+ggplotly(site_map, tooltip = c("text")) %>% 
+  plotly::style(hoveron = "point") %>% 
+  layout(title = list(text = paste0("Collective/Reception centres and cash response beneficiaries", 
+                                    "<br>", 
+                                    "<sup>", 
+                                    "IDPs in red, beneficiaries in blue, size shows number of persons; click and drag to zoom")))
+
+
+
+```
+
+
+Data on cash response extracted from [FSL earthquake tracker](https://docs.google.com/spreadsheets/d/1KGqt-3YDh2k8qNCksOJAndRPO56Gq6pGs6esEQtIFIw/edit#gid=1890981115) on `r format(Sys.time(), "%B %d %Y")`. Data on collective centres extracted from March 15 2023. 
+
+<br>
+
+UNHCR site tracker searchable
+
+```{r dt}
+sites %>% 
+  select(governorate, 
+         district, 
+         sub_district, 
+         community, 
+         site_name, 
+         longitude_x,
+         latitude_y, 
+         families, 
+         individuals, 
+         focal_point = organization_name, 
+         focal_contact = phone) %>% 
+  datatable(options = list(pageLength = 10, scrollX = TRUE), 
+            filter = list(position = "top", clear = FALSE),
+            caption = htmltools::tags$caption(style = 'caption-side: top; 
+                                    text-align: center; font-size:120% ;',
+                                    "Reference table -- Collective sites, maintained by UNHCR")) %>% 
+  formatStyle(0, target = "row", lineHeight = "80%", fontSize = "80%")
+  
+```
+
+<br><br><br>
+
+
+# Cash response actors
+
+In the scatterplot below, each point is a single cash working group partner. The x-axis indicates the number of beneficiaries reached per agency and the y-axis indicates the number of communities (admin4) reached. 
+
+From the scatterplot, we may split partners into two groups -- those with below 10,000 beneficiaries and those with more 
+
+```{r totals, eval = FALSE}
+
+fsl %>% 
+  filter(activity == "Cash Response" & planned_implemented == "Implemented") %>% 
+  mutate(usd_total = families * quantity) %>% 
+  summarise(beneficiaries = sum(beneficiaries, na.rm = TRUE), 
+            usd_total = sum(usd_total, na.rm = TRUE))
+
+```
+
+
+<br>
+
+```{r partner-scatter}
+partner_scatter <- fsl %>% 
+   filter(activity == "Cash Response" & planned_implemented == "Implemented") %>% 
+  group_by(partner_code, 
+           admin2pcode, 
+           admin4pcode) %>% 
+  slice(which.max(beneficiaries)) %>% 
+  ungroup() %>% 
+  group_by(partner_code) %>% 
+  summarise(beneficiaries = sum(beneficiaries, na.rm = TRUE), 
+            communities = n_distinct(admin4pcode)) %>% 
+  ggplot(aes(x = beneficiaries, y = communities)) +
+  geom_point(aes(size = beneficiaries, 
+                 text = paste0(partner_code, "\n", 
+                               "beneficiaries: ", format(beneficiaries, big.mark = ","), "\n", 
+                               "communities: ", communities))) + 
+  scale_x_log10(labels = comma) + 
+  theme(legend.position = "none") + 
+  labs(x = "Beneficiaries reached", 
+       y = "Communities (admin4) reached", 
+       title = "Implementing partners -- beneficiaries and communities reached")
+
+ggplotly(partner_scatter, tooltip = c("text")) %>% 
+  layout(showlegend = TRUE, legend = list(font = (list(size = 6)))) %>% 
+  plotly::style(hoveron = "point") %>% 
+  layout(title = list(text = paste0("Beneficiaries and communities reached",
+                                    "<br>",
+                                    "<sup>",
+                                    "Cash response implementing partners","</sup>")))
+
+
+```
+
+<br>
+
+Below are the top 10 Cash Actors to date. 
+
+<br>
+
+```{r}
+fsl %>% 
+  filter(activity == "Cash Response" & planned_implemented == "Implemented") %>% 
+  group_by(partner_code, 
+           admin2pcode, 
+           admin4pcode) %>% 
+  slice(which.max(beneficiaries)) %>% 
+  ungroup() %>% 
+  group_by(partner_code) %>% 
+  summarise(beneficiaries = sum(beneficiaries, na.rm = TRUE), 
+            districts = n_distinct(admin2pcode), 
+            communities = n_distinct(admin4pcode)) %>% 
+  arrange(desc(beneficiaries)) %>% 
+  head(10) %>% 
+  flextable() %>% 
+  set_caption("Summary table -- top 10 cash response actors") %>% 
+  theme_zebra() %>% 
+  set_table_properties(layout = "autofit", width = .8) %>% 
+  footnote(as_paragraph("Only partners who provided more than USD 100/family/month"), 
+           i = 1, j = 1)
+  
+```
+
+
+<br>
+
+Cash response activities currently reach 14% of FSL beneficiary frequencies. It is a priority for the cash working group to determine the extent of cash response activities in the other clusters as well. USD `r fsl %>% filter(activity == "Cash Response" & planned_implemented == "Implemented") %>% mutate(usd_total = families * quantity) %>% {sum(.$usd_total)} %>% format(big.mark = ",")` has been distributed across `r fsl %>% filter(activity == "Cash Response" & planned_implemented == "Implemented") %>% {n_distinct(.$admin4pcode)}` communities and `r fsl %>% filter(activity == "Cash Response" & planned_implemented == "Implemented") %>% {n_distinct(.$admin3pcode)}` 
+
+
+```{r}
+fsl %>% 
+  filter(activity == "Cash Response" & planned_implemented == "Implemented") %>% 
+  filter(quantity > 100) %>% 
+  mutate(usd_total = families * quantity) %>% 
+  group_by(partner_code) %>% 
+  summarise(usd_total = sum(usd_total, na.rm = TRUE), 
+            families = sum(families, na.rm = TRUE)) %>% 
+  mutate(usd_per_fam = round(usd_total / families, digits = 2)) %>%
+  arrange(desc(usd_total)) %>% 
+  flextable() %>% 
+  set_caption("USD per family") %>% 
+  theme_zebra() %>% 
+  flextable::set_table_properties(layout = "autofit", width = .8)
+```
+
+<br>
+
+Total usd out 
+
+<br>
+
+```{r}
+fsl %>%
+  filter(planned_implemented == "Implemented") %>% 
+  filter(activity != "Cash Response Low") %>% 
+  filter(!is.na(activity)) %>% 
+  count(unit, activity, 
+        wt = beneficiaries) %>% 
+  mutate(pc = round(n / sum(n) * 100, digits = 2)) %>% 
+  select(activity, unit, beneficiaries = n, pc) %>% 
+  arrange(desc(pc)) %>% 
+  flextable() %>% 
+  theme_zebra() %>% 
+  set_caption("FSL beneficiaries by activity") %>% 
+  set_table_properties(layout = "autofit", 
+                       width = .6)
+
+  
+  
+```
+
+<br>
+
+Overlap between activities
+
+Maybe make some maps -- one of cash response beneficiaries who have received more than USD 100, 
+then a chart of cash response beneficiaries as percentage of the total and total number of FSL beneficiaries reached. 
+
+
+
+
+
