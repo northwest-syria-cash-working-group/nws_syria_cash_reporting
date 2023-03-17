@@ -174,14 +174,15 @@ site_map <- sites_locations_fsl %>%
   mutate(type = fct_relevel(type, 
                             c("RC/IDP", "Beneficiaries"))) %>% 
   ggplot() + 
-  geom_sf(size = 0.1) +
+  geom_sf(size = 0.1, colour = "grey70") +
   geom_point(aes(size = persons, 
                   colour = type,
                   x = longitude_x, y = latitude_y,
                   text = paste0("sub_district: ", sub_district, "\n",
                                 "site: ", site_name, "\n",  
                                 "persons: ", persons, "\n", 
-                                "type: ", type)), pch = 1
+                                "type: ", type)), 
+             shape = 21, stroke = .5
              # Adjusting alpha won't affect a plotly
              ) +
   scale_size_continuous(labels = comma) +
@@ -194,7 +195,7 @@ site_map <- sites_locations_fsl %>%
 
 ggplotly(site_map, tooltip = c("text")) %>% 
   plotly::style(hoveron = "point") %>% 
-  layout(title = list(text = paste0("Collective/Reception centres and cash response beneficiaries", 
+  layout(title = list(text = paste0("Collective centres and cash response beneficiaries", 
                                     "<br>", 
                                     "<sup>", 
                                     "IDPs in red, beneficiaries in blue, size shows number of persons; click and drag to zoom; mouse over for details"))) %>% 
@@ -374,8 +375,6 @@ fsl %>%
 ```
 
 <br>
-
-
 
 
 

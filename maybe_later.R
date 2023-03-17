@@ -67,3 +67,37 @@ fsl %>%
   scale_x_continuous(labels = comma)
 
 ggsave("mpc_district.png", dpi = 300, height = 11.7, width = 16.5, units = "in")
+
+
+site_map <- pcode3_shape %>% 
+  filter(ADM1_PCODE %in% c("SY02", "SY07")) %>% 
+  left_join(sites_locations_fsl, 
+            by = c("ADM1_PCODE" = "admin1pcode")) %>% 
+  st_as_sf() %>% 
+  mutate(type = fct_relevel(type, 
+                            c("RC/IDP", "Beneficiaries"))) %>% 
+  ggplot() + 
+  geom_sf(size = 0.1) +
+  geom_point(aes(size = persons, 
+                 colour = type,
+                 x = longitude_x, y = latitude_y,
+                 text = paste0("site :", site_name, "\n",  
+                               "persons: ", persons, "\n", 
+                               "type: ", type)), pch = 1
+             # Adjusting alpha won't affect a plotly
+  ) +
+  scale_size_continuous(labels = comma) +
+  theme_void() + 
+  theme(plot.background = element_rect(fill = "white", colour = NA), 
+        plot.caption = element_text(hjust = 0.5), 
+        legend.position = "none") +
+  labs(title = "Collective/reception centres and MPC beneficiaries", 
+       subtitle = "IDPs in red, beneficiaries in blue, size shows number of persons")
+
+ggplotly(site_map, tooltip = c("text")) %>% 
+  plotly::style(hoveron = "point") %>% 
+  layout(title = list(text = paste0("Collective/Reception centres and cash response beneficiaries", 
+                                    "<br>", 
+                                    "<sup>", 
+                                    "IDPs in red, beneficiaries in blue, size shows number of persons; click and drag to zoom; mouse over for details"))) %>% 
+  partial_bundle()
