@@ -1,0 +1,52 @@
+"0","site_map <- sites_locations_fsl %>% 
+  left_join(locations %>% select(admin3pcode, admin4pcode), 
+            by = ""admin4pcode"") %>%
+  right_join(pcode3_shape, 
+             by = c(""admin3pcode"" = ""ADM3_PCODE"")) %>% glimpse()
+"
+"1","Rows: 551"
+"1",""
+"1","
+"
+"1","Columns: 35"
+"1",""
+"1","
+"
+"1","$ admin1pcode      [3m[38;5;246m<chr>[39m[23m ""SY02"", ""SY02"", ""SY02"", ""SY02"", ""SY02"", ""SY02"", ""SY02"", ""SY02"", ""SY02"", ""~
+$ admin4pcode      [3m[38;5;246m<chr>[39m[23m ""C1021"", ""C1022"", ""C1025"", ""C1032"", ""C1036"", ""C1038"", ""C1041"", ""C1139"", ""~
+$ sub_district     [3m[38;5;246m<chr>[39m[23m ""Atareb"", ""Atareb"", ""Atareb"", ""Atareb"", ""Atareb"", ""Atareb"", ""Atareb"", ""Da~
+$ site_name        [3m[38;5;246m<chr>[39m[23m ""Babka"", ""Atareb"", ""Batbu"", ""Jeineh"", ""Kafr Naseh Elatareb"", ""Maaret Atar~
+$ longitude_x      [3m[38;5;246m<dbl>[39m[23m 36.75367, 36.82838, 36.73979, 36.80145, 36.78826, 36.81829, 36.83216, 36.~
+$ latitude_y       [3m[38;5;246m<dbl>[39m[23m 36.14206, 36.13788, 36.13338, 36.11709, 36.13590, 36.15757, 36.07805, 36.~
+$ persons          [3m[38;5;246m<dbl>[39m[23m 235, 9505, 1000, 1000, 1000, 1000, 1000, 2100, 650, 777, 250, 375, 590, 9~
+$ type             [3m[38;5;246m<chr>[39m[23m ""Beneficiaries"", ""Beneficiaries"", ""Beneficiaries"", ""Beneficiaries"", ""Bene~
+$ temp_code        [3m[38;5;246m<chr>[39m[23m NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N~
+$ type_of_location [3m[38;5;246m<chr>[39m[23m ""Community"", ""Community"", ""Community"", ""Community"", ""Community"", ""Communi~
+$ status           [3m[38;5;246m<chr>[39m[23m NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N~
+$ site_name_ar     [3m[38;5;246m<chr>[39m[23m NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N~
+$ admin3pcode      [3m[38;5;246m<chr>[39m[23m ""SY020001"", ""SY020001"", ""SY020001"", ""SY020001"", ""SY020001"", ""SY020001"", ""~
+$ Shape_Leng       [3m[38;5;246m<dbl>[39m[23m 0.8709999, 0.8709999, 0.8709999, 0.8709999, 0.8709999, 0.8709999, 0.87099~
+$ Shape_Area       [3m[38;5;246m<dbl>[39m[23m 0.03085819, 0.03085819, 0.03085819, 0.03085819, 0.03085819, 0.03085819, 0~
+$ ADM3_EN          [3m[38;5;246m<chr>[39m[23m ""Atareb"", ""Atareb"", ""Atareb"", ""Atareb"", ""Atareb"", ""Atareb"", ""Atareb"", ""Da~
+$ ADM3_AR          [3m[38;5;246m<chr>[39m[23m ""أتارب"", ""أتارب"", ""أتارب"", ""أتارب"", ""أتارب"", ""أتارب"", ""أتارب"", ""دارة عزة""~
+$ ADM3_REF         [3m[38;5;246m<chr>[39m[23m NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N~
+$ ADM3ALT1EN       [3m[38;5;246m<chr>[39m[23m NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N~
+$ ADM3ALT2EN       [3m[38;5;246m<chr>[39m[23m NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N~
+$ ADM3ALT1AR       [3m[38;5;246m<chr>[39m[23m NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N~
+$ ADM3ALT2AR       [3m[38;5;246m<chr>[39m[23m NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N~
+$ ADM2_EN          [3m[38;5;246m<chr>[39m[23m ""Jebel Saman"", ""Jebel Saman"", ""Jebel Saman"", ""Jebel Saman"", ""Jebel Saman""~
+$ ADM2_AR          [3m[38;5;246m<chr>[39m[23m ""جبل سمعان"", ""جبل سمعان"", ""جبل سمعان"", ""جبل سمعان"", ""جبل سمعان"", ""جبل سمع~
+$ ADM2_PCODE       [3m[38;5;246m<chr>[39m[23m ""SY0200"", ""SY0200"", ""SY0200"", ""SY0200"", ""SY0200"", ""SY0200"", ""SY0200"", ""SY~
+$ ADM1_EN          [3m[38;5;246m<chr>[39m[23m ""Aleppo"", ""Aleppo"", ""Aleppo"", ""Aleppo"", ""Aleppo"", ""Aleppo"", ""Aleppo"", ""Al~
+$ ADM1_AR          [3m[38;5;246m<chr>[39m[23m ""حلب"", ""حلب"", ""حلب"", ""حلب"", ""حلب"", ""حلب"", ""حلب"", ""حلب"", ""حلب"", ""حلب"", ""حل~
+$ ADM1_PCODE       [3m[38;5;246m<chr>[39m[23m ""SY02"", ""SY02"", ""SY02"", ""SY02"", ""SY02"", ""SY02"", ""SY02"", ""SY02"", ""SY02"", ""~
+$ ADM0_EN          [3m[38;5;246m<chr>[39m[23m ""Syrian Arab Republic"", ""Syrian Arab Republic"", ""Syrian Arab Republic"", ""~
+$ ADM0_AR          [3m[38;5;246m<chr>[39m[23m ""الجمهورية العربية السورية"", ""الجمهورية العربية السورية"", ""الجمهورية العر~
+$ ADM0_PCODE       [3m[38;5;246m<chr>[39m[23m ""SY"", ""SY"", ""SY"", ""SY"", ""SY"", ""SY"", ""SY"", ""SY"", ""SY"", ""SY"", ""SY"", ""SY"", ""~
+$ date             [3m[38;5;246m<date>[39m[23m 2017-06-01, 2017-06-01, 2017-06-01, 2017-06-01, 2017-06-01, 2017-06-01, ~
+$ validOn          [3m[38;5;246m<date>[39m[23m 2020-12-17, 2020-12-17, 2020-12-17, 2020-12-17, 2020-12-17, 2020-12-17, ~
+$ validTo          [3m[38;5;246m<date>[39m[23m NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, ~
+$ geometry         [3m[38;5;246m<POLYGON [°]>[39m[23m POLYGON ((36.81646 36.21565..., POLYGON ((36.81646 36.21565..., P~"
+"1",""
+"1","
+"
