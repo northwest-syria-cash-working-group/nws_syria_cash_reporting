@@ -1,5 +1,5 @@
 ---
-title: "Cash response and collective sites"
+title: "Northwest Syria Cash Working Group report on multipurpose cash"
 date:  "`r format(Sys.time(), '%d %B, %Y')`"
 output:
   html_document:
@@ -148,9 +148,35 @@ sites_locations_fsl <- read_csv("./data/for_report/sites_locations_fsl.csv") %>%
 
 ```  
 
+<br><br><br>
 
+# 1 Summary of achievements to-date 
 
-# 1. Map of MPC beneficiaries and collective/reception centres
+```{r summary table}
+fsl %>% 
+  filter(activity == "Cash Response" & planned_implemented == "Implemented") %>%
+  mutate(usd_total = families * quantity) %>% 
+  group_by(governorate, district) %>% 
+  summarise(partners = n_distinct(partner_code), 
+            communities = n_distinct(admin4pcode), 
+            households = sum(families, na.rm = TRUE), 
+            beneficiaries = sum(beneficiaries, na.rm = TRUE), 
+            total_usd = sum(usd_total, na.rm = TRUE)) %>% 
+  ungroup() %>% 
+  mutate(`%_beneficiaries` = 
+           round(beneficiaries / sum(beneficiaries, na.rm = TRUE) * 100, digits = 2)) %>%
+  adorn_totals("row",,,, households, beneficiaries, total_usd, `%_beneficiaries`) %>% 
+  mutate(`%_beneficiaries` = ifelse(`%_beneficiaries` > 99.98, 100, `%_beneficiaries`)) %>% 
+  flextable() %>% 
+  set_caption("308,467 people reached, USD 9.4 million disbursed, 20230317") %>% 
+  theme_zebra()
+  
+  
+```
+
+<br><br><br>
+
+# 2. Map of MPC beneficiaries and collective/reception centres
 
 As of `r format(Sys.time(), "%B %d %Y")`, a total of `r fsl %>% filter(activity == "Cash Response" & planned_implemented == "Implemented") %>% {sum(.$beneficiaries)} %>% format(big.mark = ",")` persons or `r fsl %>% filter(activity == "Cash Response" & planned_implemented == "Implemented") %>% {sum(.$families)} %>% format(big.mark = ",")` families have been reached by MPC interventions. 
 
@@ -198,8 +224,7 @@ ggplotly(site_map, tooltip = c("text")) %>%
   layout(title = list(text = paste0("Collective centres and cash response beneficiaries", 
                                     "<br>", 
                                     "<sup>", 
-                                    "IDPs in red, beneficiaries in blue, size shows number of persons; click and drag to zoom; mouse over for details"))) %>% 
-  partial_bundle()
+                                    "IDPs in red, beneficiaries in blue, size shows number of persons; click and drag to zoom; mouse over for details"))) 
 
 # Will this work? 
 # %>% partial_bundle()
@@ -211,7 +236,7 @@ Data on cash response extracted from [FSL earthquake tracker](https://docs.googl
 <br><br>
 
 
-### 1.1 Geographic breakdown of beneficiaries
+### 2.1 Geographic breakdown of beneficiaries
 
 ```{r}
 fsl %>% 
@@ -235,7 +260,7 @@ fsl %>%
 
 <br><br>
 
-### 1.2 UNHCR site tracker -- searchable table
+### 2.2 UNHCR site tracker -- searchable table
 
 ```{r dt}
 sites %>% 
@@ -263,7 +288,7 @@ sites %>%
 <br><br><br>
 
 
-# 2. Cash response actors
+# 3. Cash response actors
 
 In the scatterplot below, each point is a single cash working group partner. The x-axis indicates the number of beneficiaries reached per agency and the y-axis indicates the number of communities (admin4) reached. 
 
@@ -282,7 +307,7 @@ fsl %>%
 
 <br><br>
 
-### 2.1 Beneficiaries and geographic reach
+### 3.1 Beneficiaries and geographic reach
 
 ```{r partner-scatter}
 partner_scatter <- fsl %>% 
@@ -319,8 +344,47 @@ ggplotly(partner_scatter, tooltip = c("text")) %>%
 
 <br><br>
 
-### 2.2 Top 10 MPC actors to-date
+### 3.2 Reach and footprint of cash response actors
 
+```{r}
+stack_text <- fsl %>% 
+  filter(activity == "Cash Response" & planned_implemented == "Implemented") %>% 
+  group_by(district) %>% 
+  summarise(total = sum(beneficiaries, na.rm = TRUE)) %>% 
+  mutate(district = fct_relevel(district, 
+                             c("Afrin", "Al Bab", "A'zaz", "Jarablus",
+                               "Jebel Saman", "Harim", "Idleb", "Jisr-Ash-Shugur")))
+
+stack <- fsl %>% 
+  filter(activity == "Cash Response" & planned_implemented == "Implemented") %>% 
+  group_by(district, partner_code) %>% 
+  summarise(beneficiaries = sum(beneficiaries, na.rm = TRUE)) %>% 
+  mutate(district = fct_relevel(district, 
+                             c("Afrin", "Al Bab", "A'zaz", "Jarablus",
+                               "Jebel Saman", "Harim", "Idleb", "Jisr-Ash-Shugur"))) %>% 
+  ggplot(aes(x = district, 
+             y = beneficiaries)) +
+  geom_col(aes(fill = partner_code)) + 
+  geom_text(data = stack_text, 
+            aes(y = total + 6000, 
+                label = scales::comma(total))) + 
+  scale_y_continuous(labels = comma) + 
+  labs(x = "", 
+       y = "Beneficiaries", 
+       title = "Partner achievements by district, 20230317") + 
+  theme(legend.position = "none")
+
+ggplotly(stack, tooltip = c("fill", "x", "y")) %>% 
+  layout(title = list(text = paste0("Partner achievements by district, 20230317", 
+                                    "<br>", 
+                                    "<sup>", 
+                                    "Mouse over for details")))
+
+```
+
+<br>
+
+USD `r fsl %>% filter(activity == "Cash Response" & planned_implemented == "Implemented") %>% mutate(usd_total = families * quantity) %>% {sum(.$usd_total)} %>% format(big.mark = ",")` has been distributed across `r fsl %>% filter(activity == "Cash Response" & planned_implemented == "Implemented") %>% {n_distinct(.$admin4pcode)}` communities and `r fsl %>% filter(activity == "Cash Response" & planned_implemented == "Implemented") %>% {n_distinct(.$admin3pcode)}` sub-districts in NW Syria. 
 <br>
 
 ```{r}
@@ -336,9 +400,8 @@ fsl %>%
             districts = n_distinct(admin2pcode), 
             communities = n_distinct(admin4pcode)) %>% 
   arrange(desc(beneficiaries)) %>% 
-  head(10) %>% 
   flextable() %>% 
-  set_caption("Summary table -- top 10 cash response actors") %>% 
+  set_caption("Reach and footprint of cash response actors") %>% 
   theme_zebra() %>% 
   set_table_properties(layout = "autofit", width = .8) %>% 
   footnote(as_paragraph("Only partners who provided more than USD 100/family/month"), 
@@ -347,19 +410,18 @@ fsl %>%
 ```
 
 
-<br>
-
-USD `r fsl %>% filter(activity == "Cash Response" & planned_implemented == "Implemented") %>% mutate(usd_total = families * quantity) %>% {sum(.$usd_total)} %>% format(big.mark = ",")` has been distributed across `r fsl %>% filter(activity == "Cash Response" & planned_implemented == "Implemented") %>% {n_distinct(.$admin4pcode)}` communities and `r fsl %>% filter(activity == "Cash Response" & planned_implemented == "Implemented") %>% {n_distinct(.$admin3pcode)}` sub-districts in NW Syria. 
 
 <br><br>
 
-### 2.3 USD disbursed by partner
+
+
+
+### 3.3 USD disbursed by partner
 
 
 ```{r}
 fsl %>% 
   filter(activity == "Cash Response" & planned_implemented == "Implemented") %>% 
-  filter(quantity > 100) %>% 
   mutate(usd_total = families * quantity) %>% 
   group_by(partner_code) %>% 
   summarise(usd_total = sum(usd_total, na.rm = TRUE), 
@@ -375,6 +437,7 @@ fsl %>%
 ```
 
 <br>
+
 
 
 
