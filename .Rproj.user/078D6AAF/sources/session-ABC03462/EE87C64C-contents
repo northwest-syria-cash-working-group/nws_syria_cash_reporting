@@ -207,7 +207,8 @@ site_map <- sites_locations_fsl %>%
                   text = paste0("sub_district: ", sub_district, "\n",
                                 "site: ", site_name, "\n",  
                                 "persons: ", persons, "\n", 
-                                "type: ", type)), 
+                                "type: ", type, "\n", 
+                                "lon_x: ", longitude_x, "\n",                                 "lat_y: ", latitude_y)), 
              shape = 21, stroke = .5
              # Adjusting alpha won't affect a plotly
              ) +
