@@ -379,7 +379,7 @@ eq %>%
          damaged_houses, damaged_houses_100k) %>% 
   flextable() %>% 
   theme_zebra() %>% 
-  set_table_properties(layout = "autofit", width = .8) %>% 
+  set_table_properties(layout = "autofit", width = .99) %>% 
   set_caption("Casualties and damaged houses, absolute figures and per 100,000 persons") %>% 
   footnote(i = 1, j = 3:6, part = "header",
            as_paragraph("Data from the Assistance Coordination Unit, Syria 20230307"))
@@ -434,7 +434,7 @@ The establishment of subnational targets at the district and sub-district level,
 
 ## 3.1 Breakdown by partner and district
 
-Harim, by far and away has the highest concentration of partners, double that of the next highest district (Afrin). 
+Harim, by far and away has the highest concentration of partners (12), double that of the next highest district (Afrin). 
 
 <br>
 
@@ -476,6 +476,7 @@ ggplotly(stack, tooltip = c("fill", "x", "y")) %>%
 
 ```
 
+<br><br>
 
 ## 3.2 Scatterplot of sub-districts 
 
@@ -486,7 +487,7 @@ The size of each point indicates the number of dead or wounded persons there per
 <br>
 
 
-```{r}
+```{r, dpi = 300}
 eq %>% 
   filter(admin3pcode %in% nw_pcode3 & 
            district %in% c("Harim", "Idleb", "Jisr-Ash-Shugur",
@@ -517,7 +518,6 @@ eq %>%
   ggplot(aes(x = population, y = beneficiaries)) + 
   geom_point(aes(size = wounded_dead_100k)) + 
   geom_text(aes(label = sub_district), hjust = 1, vjust = 1, 
-            check_overlap = TRUE, 
             size = 2) + 
   scale_x_log10(breaks = c(0, 3000, 10000, 30000, 100000, 300000, 1000000), 
                 labels = comma) + 
@@ -536,7 +536,7 @@ eq %>%
 
 <br>
 
-Overall, we see fair alignment between the magnitude of the needs (Total population) and the number of beneficiaries -- this is evidenced by the blue line showing a positive relationship. 
+Overall, we see fair alignment between the magnitude of the needs (total population) and the number of beneficiaries -- this is evidenced by the blue line showing a positive relationship. 
 
 However, we do note several mismatches -- Dana seems to have received an outsized share of beneficiaries, especially when considering the casualty rate. And Kafr Takharim seems to have been allocated relatively fewer resources in comparison to the death toll there. 
 
@@ -548,7 +548,7 @@ However, we do note several mismatches -- Dana seems to have received an outsize
 
 In the scatterplot below, each point is a single cash working group partner. The x-axis indicates the number of beneficiaries reached per agency and the y-axis indicates the number of communities (admin4) reached. 
 
-From the scatterplot, we may split partners into two groups -- those with below 10,000 beneficiaries and those with more 
+<br>
 
 ```{r totals, eval = FALSE}
 
