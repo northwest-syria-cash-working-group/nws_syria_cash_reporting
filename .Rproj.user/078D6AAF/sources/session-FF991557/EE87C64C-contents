@@ -1,5 +1,5 @@
 ---
-title: "Northwest Syria Cash Working Group Earthquake Response Bulletin"
+title: "DRAFT Northwest Syria Cash Working Group Earthquake Response Bulletin"
 date:  "`r format(Sys.time(), '%d %B, %Y')`"
 output:
   html_document:
@@ -390,6 +390,8 @@ eq %>%
 
 
 ```
+
+<br>
 
 When reviewing the district-level spread of casualties and totally- and partially-damaged houses, Harim and Afrin do stand out in terms of the magnitude of the damage, though it should be noted that the share of damaged houses in Afrin is much higher than in Harim. 
 
