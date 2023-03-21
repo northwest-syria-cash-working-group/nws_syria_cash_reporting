@@ -186,6 +186,10 @@ hno <- read_excel("./data/2023HNO_PiN_Severity_detailedAoI_FORSHARE 15032023.xls
 nw_pcode3 <- hno %>% 
   filter(ao_c == "NW") %>% 
   pull(admin3pcode)
+
+# nw_pcode3 %>% 
+#   as_tibble() %>% 
+#   write_csv("nw_pcode3.csv")
 ```
 
 
@@ -254,7 +258,7 @@ site_map <- sites_locations_fsl %>%
                                 "persons: ", persons, "\n", 
                                 "type: ", type, "\n", 
                                 "lon_x: ", longitude_x, "\n",                                 "lat_y: ", latitude_y)), 
-             shape = 21, stroke = .5
+             shape = 21, stroke = .2
              # Adjusting alpha won't affect a plotly
              ) +
   scale_size_continuous(labels = comma) +
