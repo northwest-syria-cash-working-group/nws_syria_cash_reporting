@@ -263,7 +263,8 @@ site_map <- sites_locations_fsl %>%
                                 "site: ", site_name, "\n",  
                                 "persons: ", persons, "\n", 
                                 "type: ", type, "\n", 
-                                "lon_x: ", longitude_x, "\n",                                 "lat_y: ", latitude_y)), 
+                                "lon_x: ", longitude_x, "\n",                                
+                                "lat_y: ", latitude_y)), 
              shape = 21, stroke = .2
              # Adjusting alpha won't affect a plotly
              ) +
@@ -288,10 +289,11 @@ ggplotly(site_map, tooltip = c("text")) %>%
 # ggsave("site_map.png", dpi = 300, height = 8.27, width = 11.69, units = "in")
 ```
 
+<br>
 
 Data on cash response extracted from [FSL earthquake tracker](https://docs.google.com/spreadsheets/d/1KGqt-3YDh2k8qNCksOJAndRPO56Gq6pGs6esEQtIFIw/edit#gid=1890981115) on March 17 2023. Data on collective centres extracted from March 15 2023. 
 
-A revised version of the map will be available for further reporting with the revised 4Ws that includes all available codes for temporay sites. 
+A revised version of the map will be available for further reporting with the revised 4Ws that includes all available codes for temporary sites. 
 
 
 <br><br>
@@ -698,11 +700,11 @@ fsl %>%
 <br><br><br>
 
 
-# 5. UNHCR site tracker -- searchable table
+# 5. CCCM site tracker -- searchable table
 
 <br>
 
-Data from [UNHCR site tracker](https://docs.google.com/spreadsheets/d/1DDBvITdg5n4eC-l3m6WEaLE7290ez9hM/edit#gid=554801999). Extracted 15 March 2023. 
+Data from [CCCM site tracker](https://docs.google.com/spreadsheets/d/1DDBvITdg5n4eC-l3m6WEaLE7290ez9hM/edit#gid=554801999). Extracted 15 March 2023. 
 
 <br>
 
@@ -724,7 +726,7 @@ sites %>%
             filter = list(position = "top", clear = FALSE),
             caption = htmltools::tags$caption(style = 'caption-side: top; 
                                     text-align: center; font-size:120% ;',
-                                    "Reference table -- Collective sites, list maintained by UNHCR")) %>% 
+                                    "Reference table -- Collective sites, list maintained by CCCM")) %>% 
   formatStyle(0, target = "row", lineHeight = "80%", fontSize = "80%")
   
 ```
