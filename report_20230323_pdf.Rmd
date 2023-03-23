@@ -1,6 +1,7 @@
 ---
 title: "Northwest Syria Cash Working Group Earthquake Response Bulletin"
 date:  "`r format(Sys.time(), '%d %B, %Y')`"
+author: "This is a PDF of an online report. Click [here](https://northwest-syria-cash-working-group.github.io/nws_syria_cash_reporting/) to access it"
 output:
   pdf_document:
     toc: yes
@@ -94,6 +95,10 @@ mode <- function(x) {
   ux[which.max(tabulate(match(x, ux)))]
 }
 
+set_flextable_defaults(fonts_ignore = TRUE)
+
+knitr::opts_chunk$set(ft.tabcolsep=0, ft.latex.float = "none")
+
 ```
 
 ```{r data}
@@ -174,6 +179,8 @@ nw_pcode3 <- hno %>%
 
 <br><br><br>
 
+\newpage
+
 # 1. MPC response overview
 
 As of 23 March 2023, a total of `r fsl %>% filter(activity == "Cash Response" & planned_implemented == "Implemented") %>% {sum(.$beneficiaries)} %>% format(big.mark = ",")` persons or `r fsl %>% filter(activity == "Cash Response" & planned_implemented == "Implemented") %>% {sum(.$families)} %>% format(big.mark = ",")` families have been reached by MPC interventions. 
@@ -207,7 +214,9 @@ fsl %>%
   footnote(i = 1, j = 6, part = "header", ref_symbols = "a",
            as_paragraph("Beneficiary figures include only reported MPC with a minimum transfer value of USD 100")) %>% 
   footnote(i = 1, j = 8, part = "header", ref_symbols = "b",  
-           as_paragraph("Percentage of all MPC beneficiaries reached in NW Syria")) 
+           as_paragraph("Percentage of all MPC beneficiaries reached in NW Syria")) %>% 
+  fit_to_width(8, unit = "in") %>% 
+  fontsize(size = 8, part = "header")
 
   
 ```
@@ -220,10 +229,13 @@ fsl %>%
 
 <br>
 
+Interactive elements do not work in a PDF. Click [here](https://northwest-syria-cash-working-group.github.io/nws_syria_cash_reporting/#map-of-mpc-beneficiaries-and-collectivereception-centres) to access the online version of this map. 
+
+<br> 
 
 ```{r plotly-sites}
 
-site_map <- sites_locations_fsl %>% 
+sites_locations_fsl %>% 
   left_join(locations %>% select(admin3pcode, admin4pcode), 
             by = "admin4pcode") %>%
   right_join(pcode3_shape, 
@@ -253,12 +265,6 @@ site_map <- sites_locations_fsl %>%
   labs(title = "Collective/reception centres and MPC beneficiaries", 
        subtitle = "IDPs in red, beneficiaries in blue, size shows number of persons")
 
-ggplotly(site_map, tooltip = c("text")) %>% 
-  plotly::style(hoveron = "point") %>% 
-  layout(title = list(text = paste0("Collective centres and cash response beneficiaries", 
-                                    "<br>", 
-                                    "<sup>", 
-                                    "IDPs in red, beneficiaries in blue, size shows number of persons; click and drag to zoom; mouse over for details"))) 
 
 # Will this work? 
 # %>% partial_bundle()
@@ -369,7 +375,9 @@ eq %>%
   set_table_properties(layout = "autofit", width = .99) %>% 
   set_caption("Casualties and damaged houses, absolute figures and per 100,000 persons") %>% 
   footnote(i = 1, j = 3:6, part = "header",
-           as_paragraph("Data from the Assistance Coordination Unit, Syria 20230307"))
+           as_paragraph("Data from the Assistance Coordination Unit, Syria 20230307")) %>% 
+  fit_to_width(8, unit = "in") %>% 
+  fontsize(size = 8, part = "header")
 
 
 ```
@@ -408,8 +416,10 @@ hno %>%
   theme_zebra() %>% 
   set_table_properties(layout = "autofit", width = .8) %>% 
   set_caption("Percentage of population reached by district") %>% 
-  footnote(i = 1, j = 3, part = "header", 
-           as_paragraph("Total population of sub-districts within the NW AOC, persons not residing in the NW AOC have been excluded from this total"))
+  footnote(i = 1, j = 3, part = "header", inline = TRUE,
+           as_paragraph(c("Total population of sub-districts within the NW AOC"))) %>% 
+  fit_to_width(8, unit = "in") %>% 
+  fontsize(size = 8, part = "header")
 ```
 
 <br>
@@ -425,6 +435,8 @@ The establishment of subnational targets at the district and sub-district level,
 
 Harim, by far and away has the highest concentration of partners (12), double that of the next highest district (Afrin). 
 
+Interactive elements do not work in a PDF. Click [here](https://northwest-syria-cash-working-group.github.io/nws_syria_cash_reporting/#breakdown-by-partner-and-district) to access the online version of this plot.
+
 <br>
 
 ```{r}
@@ -437,7 +449,7 @@ stack_text <- fsl %>%
   mutate(district = fct_relevel(district, c("Harim", "Idleb", "Jisr-Ash-Shugur", 
   "Afrin", "Jebel Saman", "A'zaz", "Jarablus", "Al Bab")))
 
-stack <- fsl %>% 
+fsl %>% 
   filter(activity == "Cash Response" & planned_implemented == "Implemented") %>% 
   group_by(district, partner_code) %>% 
   summarise(beneficiaries = sum(beneficiaries, na.rm = TRUE)) %>% 
@@ -457,11 +469,6 @@ stack <- fsl %>%
        title = "Partner achievements by district, 20230317") + 
   theme(legend.position = "none")
 
-ggplotly(stack, tooltip = c("fill", "x", "y")) %>% 
-  layout(title = list(text = paste0("Partner achievements by district, 20230317", 
-                                    "<br>", 
-                                    "<sup>", 
-                                    "Mouse over for details")))
 
 ```
 
@@ -538,6 +545,8 @@ However, we do note several mismatches -- Dana seems to have received an outsize
 
 In the scatterplot below, each point is a single cash working group partner. The x-axis indicates the number of beneficiaries reached per agency and the y-axis indicates the number of communities (admin4) reached. 
 
+Interactive elements do not work in a PDF. Click [here](https://northwest-syria-cash-working-group.github.io/nws_syria_cash_reporting/#cash-response-actors-and-cash-disbursed) to access the online version of this plot.
+
 <br>
 
 ```{r totals, eval = FALSE}
@@ -553,7 +562,7 @@ fsl %>%
 
 
 ```{r partner-scatter}
-partner_scatter <- fsl %>% 
+fsl %>% 
    filter(activity == "Cash Response" & planned_implemented == "Implemented") %>% 
   group_by(partner_code, 
            admin2pcode, 
@@ -573,14 +582,6 @@ partner_scatter <- fsl %>%
   labs(x = "Beneficiaries reached", 
        y = "Communities (admin4) reached", 
        title = "Implementing partners -- beneficiaries and communities reached")
-
-ggplotly(partner_scatter, tooltip = c("text")) %>% 
-  layout(showlegend = TRUE, legend = list(font = (list(size = 6)))) %>% 
-  plotly::style(hoveron = "point") %>% 
-  layout(title = list(text = paste0("Beneficiaries and communities reached",
-                                    "<br>",
-                                    "<sup>",
-                                    "Cash response implementing partners","</sup>")))
 
 
 ```
@@ -677,9 +678,15 @@ fsl %>%
 
 # 5. UNHCR site tracker -- searchable table
 
-Data from [UNHCR site tracker](https://docs.google.com/spreadsheets/d/1DDBvITdg5n4eC-l3m6WEaLE7290ez9hM/edit#gid=554801999). Extracted 20230315. 
+<br>
 
-```{r dt}
+Data from [UNHCR site tracker](https://docs.google.com/spreadsheets/d/1DDBvITdg5n4eC-l3m6WEaLE7290ez9hM/edit#gid=554801999). Extracted 15 March 2023. 
+
+Interactive elements do not work in a PDF. Click [here](https://northwest-syria-cash-working-group.github.io/nws_syria_cash_reporting/#unhcr-site-tracker-searchable-table) to access the online version of this searchable table.
+
+<br>
+
+```{r dt, eval = FALSE}
 sites %>% 
   select(governorate, 
          district, 

@@ -1,0 +1,28 @@
+"0","hno %>% 
+  filter(admin2name_en %in% c(""Harim"", ""Idleb"", ""Jisr-Ash-Shugur"",
+                              ""Afrin"", ""Jebel Saman"", ""A'zaz"", ""Jarablus"", ""Al Bab"") &
+           ao_c == ""NW"") %>% 
+  group_by(governorate = admin1name_en, district = admin2name_en) %>% 
+  summarise(total_population = sum(total_population, na.rm = TRUE)) %>% 
+  left_join(
+    fsl %>%
+      filter(activity == ""Cash Response"" & planned_implemented == ""Implemented"") %>% 
+      mutate(governorate = ifelse(governorate == ""idleb"", ""Idleb"", governorate),
+             district = ifelse(district == ""idleb"", ""Idleb"", district)) %>% 
+      group_by(district) %>% 
+      summarise(beneficiaries = sum(beneficiaries, na.rm = TRUE), 
+                partners = n_distinct(partner_code)) ,  
+  by = ""district"") %>% 
+  mutate(`%_reached` = round(beneficiaries / total_population * 100, digits = 2)) %>% 
+  relocate(partners, .after = last_col()) %>% 
+  flextable() %>% 
+  theme_zebra() %>% 
+  set_table_properties(layout = ""autofit"", width = .8) %>% 
+  set_caption(""Percentage of population reached by district"") %>% 
+  footnote(i = 1, j = 3, part = ""header"", inline = TRUE
+           as_paragraph(c(""Total population of sub-districts within the NW AOC persons not residing in the NW AOC have been excluded from this total""))) %>% 
+"
+"2","Error: unexpected symbol in:
+""  footnote(i = 1, j = 3, part = ""header"", inline = TRUE
+           as_paragraph""
+"
