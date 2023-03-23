@@ -269,7 +269,7 @@ sites_locations_fsl %>%
 # Will this work? 
 # %>% partial_bundle()
 
-ggsave("site_map.png", dpi = 300, height = 8.27, width = 11.69, units = "in")
+# ggsave("site_map.png", dpi = 300, height = 8.27, width = 11.69, units = "in")
 ```
 
 
@@ -337,7 +337,7 @@ hno %>%
   plot_layout(guides = "collect") & 
   theme(legend.position = "bottom")
 
-
+# ggsave("district_barplot.png", dpi = 300, height = 8.27, width = 11.69, units = "in")
 ```
 
 <br>
