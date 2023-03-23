@@ -101,3 +101,9 @@ ggplotly(site_map, tooltip = c("text")) %>%
                                     "<sup>", 
                                     "IDPs in red, beneficiaries in blue, size shows number of persons; click and drag to zoom; mouse over for details"))) %>% 
   partial_bundle()
+
+
+# Text removed from report
+# Locations of beneficiaries have been estimated -- the FSL dataset does not call for the input of geocoordinates. Instead, the blue circles are situated at the centroids for communities/villages, as recorded in the OCHA geodamins reference dataset. 
+
+# This means that we do not have an accurate record of which centres have received which activities. This underscores the importance of including of codifying and including each of the temporary sites so that we may track the progress of the response and identify any gaps in coverage that arise. Temporary sites have been included in the revised 4Ws. 

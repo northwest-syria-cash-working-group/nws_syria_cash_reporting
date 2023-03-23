@@ -1,0 +1,25 @@
+"0","fsl %>% 
+  filter(activity == ""Cash Response"" & planned_implemented == ""Implemented"") %>%
+  mutate(usd_total = families * quantity) %>% 
+  group_by(governorate, district) %>% 
+  summarise(partners = n_distinct(partner_code), 
+            communities = n_distinct(admin4pcode), 
+            households = sum(families, na.rm = TRUE), 
+            beneficiaries = sum(beneficiaries, na.rm = TRUE), 
+            total_usd = sum(usd_total, na.rm = TRUE)) %>% 
+  ungroup() %>% 
+  mutate(`%_beneficiaries` = 
+           round(beneficiaries / sum(beneficiaries, na.rm = TRUE) * 100, digits = 2)) %>%
+  adorn_totals(""row"",,,, households, beneficiaries, total_usd, `%_beneficiaries`) %>% 
+  mutate(`%_beneficiaries` = ifelse(`%_beneficiaries` > 99.98, 100, `%_beneficiaries`)) %>% 
+  select(governorate, district, communities, partners, 
+         households, beneficiaries, total_usd, `%_beneficiaries`) %>% 
+  flextable() %>% 
+  set_caption(""360,787 people reached, USD 10.9 million disbursed, 23 March 2023"") %>% 
+  theme_zebra() %>% 
+  footnote(i = 1, j = 6, part = ""header"", ref_symbols = ""a"",
+           as_paragraph(""Beneficiary figures include only reported MPC with a minimum transfer value of USD 100"")) %>% 
+  footnote(i = 1, j = 8, part = ""header"", ref_symbols = ""b"",  
+           as_paragraph(""Percentage of NW Syria MPC beneficiaries"")) 
+"
+"2","`summarise()` has grouped output by 'governorate'. You can override using the `.groups` argument."
