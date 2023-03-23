@@ -269,7 +269,7 @@ sites_locations_fsl %>%
 # Will this work? 
 # %>% partial_bundle()
 
-# ggsave("site_map.png", dpi = 300, height = 8.27, width = 11.69, units = "in")
+ggsave("site_map.png", dpi = 300, height = 8.27, width = 11.69, units = "in")
 ```
 
 
@@ -306,7 +306,6 @@ fsl %>%
        subtitle = "as of 17 March 2023", 
        y = "") + 
   scale_x_continuous(labels = comma) + 
-  theme(legend.position = "none") +
 
 hno %>% 
   filter(admin2name_en %in% c("Harim", "Idleb", "Jisr-Ash-Shugur",
@@ -324,7 +323,7 @@ hno %>%
   mutate(district = fct_reorder(district, beneficiaries), 
          governorate = fct_relevel(governorate, 
                                    c("Idlib", "Aleppo")), 
-         pc_reached = round(beneficiaries / total_population * 100, digits = 2)) %>% 
+         pc_reached = round(beneficiaries / total_population * 100, digits = 1)) %>% 
   ggplot(aes(x = pc_reached, y = district)) +
   geom_col(aes(fill = governorate)) + 
   geom_text(aes(label = comma(pc_reached)), 
@@ -334,7 +333,9 @@ hno %>%
        subtitle = "as of 17 March 2023", 
        y = "", 
        x = "% of population reached") +
-  theme(legend.position = "none")
+  
+  plot_layout(guides = "collect") & 
+  theme(legend.position = "bottom")
 
 
 ```
