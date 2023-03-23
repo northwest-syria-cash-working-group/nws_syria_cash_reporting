@@ -303,7 +303,7 @@ fsl %>%
             hjust = "inward") + 
   scale_fill_viridis_d(begin = .3) + 
   labs(title = "MPC beneficiaries by district", 
-       subtitle = "as of 17 March 2023", 
+       subtitle = "as of 23 March 2023", 
        y = "") + 
   scale_x_continuous(labels = comma) + 
 
@@ -330,7 +330,7 @@ hno %>%
             hjust = "inward") +
   scale_fill_viridis_d(begin = .3) + 
   labs(title = "Percent of population reached", 
-       subtitle = "as of 17 March 2023", 
+       subtitle = "as of 23 March 2023", 
        y = "", 
        x = "% of population reached") +
   
