@@ -221,6 +221,53 @@ fsl %>%
   
 ```
 
+<br>
+
+```{r eval = FALSE}
+
+# Just breakdown by month -- don't know why I did a line plot instead of a barplot, 
+# maybe barplot when there are more months 
+
+fsl %>% 
+  filter(activity == "Cash Response", planned_implemented == "Implemented") %>% 
+  mutate(month = month(distribution_date)) %>% 
+  group_by(month) %>% 
+  summarise(beneficiaries = sum(beneficiaries))
+
+```
+
+
+225,619 beneficiaries were reached in February 2023 and 135,168 were reached in March 2023. 
+
+<br>
+
+```{r}
+fsl %>% 
+  mutate(distribution_date = as.Date(distribution_date)) %>% 
+  filter(activity == "Cash Response" & planned_implemented == "Implemented") %>% 
+  group_by(distribution_date) %>% 
+  summarise(beneficiaries = sum(beneficiaries)) %>% 
+  arrange(distribution_date) %>% 
+  mutate(cum_ben = cumsum(beneficiaries)) %>% 
+  mutate(cum_label = ifelse(cum_ben %in% c(2145, 225619, 360787), cum_ben, ""), 
+         cum_label = as.double(cum_label)) %>% 
+  ggplot(aes(x = distribution_date, y = cum_ben)) + 
+  geom_line(colour = "blue") + 
+  geom_text(aes(label = scales::comma(cum_label)), vjust = -.6, 
+            size = 4) + 
+  scale_x_date(date_breaks = "1 week", date_labels = "%d-%b") +
+  # Why didn't you learn this before? 
+  scale_y_continuous(labels = comma, expand = expansion(mult = .1)) + 
+  labs(x = "Distribution date", 
+       y = "Cumulative beneficiaries", 
+       title = "MPC progress by date", 
+       subtitle = "The earliest distribution was 2023-02-09")  
+  
+#ggsave("progress_line.png", dpi = 300, height = 8.27, width = 11.69, units = "in")  
+
+
+```
+
 <br><br><br>
 
 
@@ -269,7 +316,7 @@ sites_locations_fsl %>%
 # Will this work? 
 # %>% partial_bundle()
 
-ggsave("site_map.png", dpi = 300, height = 8.27, width = 11.69, units = "in")
+# ggsave("site_map.png", dpi = 300, height = 8.27, width = 11.69, units = "in")
 ```
 
 
@@ -337,7 +384,7 @@ hno %>%
   plot_layout(guides = "collect") & 
   theme(legend.position = "bottom")
 
-
+# ggsave("district_barplot.png", dpi = 300, height = 8.27, width = 11.69, units = "in")
 ```
 
 <br>
